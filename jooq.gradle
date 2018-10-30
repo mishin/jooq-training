@@ -1,0 +1,73 @@
+allprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('jooqProps')) {
+            jooqProps = project.findProperty('jooqProps')
+
+
+            jooq {//jooq begin
+                sample(sourceSets.main) {
+
+//-----------------------------------------------------------------------------------------------------------------------
+                    jdbc {
+                        driver = jooqProps.driver
+                        url = jooqProps.url
+                        user = jooqProps.user
+                        password = jooqProps.password
+                    }
+//-----------------------------------------------------------------------------------------------------------------------
+                    generator {
+                        name = 'org.jooq.codegen.DefaultGenerator'
+                        //----------------------------------------------------------------------------------------------
+                        strategy {
+                            name = 'org.jooq.codegen.example.JPrefixGeneratorStrategy'
+                        }
+                        //----------------------------------------------------------------------------------------------
+                        database {
+                            dateAsTimestamp = true
+                            inputSchema = jooqProps.inputSchema
+                            name = 'org.jooq.meta.h2.H2Database'
+                        }
+                        //----------------------------------------------------------------------------------------------
+                        generate {
+                            javaTimeTypes = false
+                            relations = true
+                            deprecated = false
+                            records = true
+                            immutablePojos = false
+                            pojos = true
+                            fluentSetters = false
+                            daos = true
+                            validationAnnotations = false
+                        }
+                        //----------------------------------------------------------------------------------------------
+                        target {
+                            packageName = jooqProps.packageName
+                            directory = 'src/main/java'
+                        }
+                    }
+//-----------------------------------------------------------------------------------------------------------------------                    
+                }
+            } //jooq end*/
+
+
+            project.tasks.getByName(sourceSets.main.compileJavaTaskName).dependsOn -= 'generateNgpJooqSchemaSource'
+        }
+    }
+}
+
+
+task clenupNgpJooqSchemaSource {
+    doFirst {
+        allprojects.each{
+            def pathWithGeneratedFilesByJook = it.rootDir.absolutePath
+            if (it.hasProperty('jooqProps')) {
+                def jooqProps = project.findProperty('jooqProps')
+                pathWithGeneratedFilesByJook = pathWithGeneratedFilesByJook + "/src/main/java/" + jooqProps.packageName.replaceAll("\\.","/")
+                delete pathWithGeneratedFilesByJook
+            }
+            
+        }
+    }
+}
+
+clean.dependsOn clenupNgpJooqSchemaSource

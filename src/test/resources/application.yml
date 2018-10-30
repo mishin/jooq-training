@@ -1,0 +1,19 @@
+jooq:
+  sql:
+   dialect: H2
+spring:
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:~/jooqdb
+    username: sa
+    password:
+    platform: h2
+
+    hikari:
+      connection-test-query: SELECT 1
+      minimum-idle: 8
+      maximum-pool-size: 64
+      pool-name: custom-jdbc-pool
+  h2:
+  console:
+    enabled: true

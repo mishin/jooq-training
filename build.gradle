@@ -1,0 +1,58 @@
+buildscript {
+    ext {
+        springBootVersion = '2.1.0.RC1'
+    }
+    repositories {
+        mavenCentral()
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url "https://repo.spring.io/milestone" }
+        //jooq is here
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'nu.studer:gradle-jooq-plugin:3.0.2'
+        //classpath 'org.jooq:jooq-codegen:3.11.2'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'nu.studer.jooq'
+
+
+group = 'ru.yusdm.training'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+ext.jooqProps = [
+        driver     : 'org.h2.Driver',
+        url        : 'jdbc:h2:~/jooqdb',
+        user       : 'sa',
+        password   : '',
+        packageName: 'ru.yusdm.training.jooq.jooqgenerated',
+        inputSchema: 'PUBLIC'
+]
+
+apply from: "${rootDir}/jooq.gradle"
+
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-jooq')
+    compile 'javax.validation:validation-api'
+    compile("com.h2database:h2")
+
+//    jooq
+    jooqRuntime 'com.h2database:h2'
+//    compile 'org.jooq:jooq-codegen'
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
